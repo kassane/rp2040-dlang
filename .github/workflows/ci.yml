@@ -1,0 +1,32 @@
+name: Wokwi-CI Build
+
+on: [push]
+
+env:
+  PICO_PLATFORM: rp2040
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: carlosperate/arm-none-eabi-gcc-action@v1
+      - uses: dlang-community/setup-dlang@v2
+        with:
+          compiler: ldc-master
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: latest
+      - name: Get pico-sdk 
+        run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
+      - name: CMake Configure 
+        run: PICO_SDK_PATH=$PWD/pico-sdk cmake -GNinja -B build -DCMAKE_BUILD_TYPE=Release
+      - name: CMake Build 
+        run: cmake --build build/ --parallel
+      - uses: wokwi/wokwi-ci-action@v1
+        with:
+          token: ${{ secrets.WOKWI_CI_TOKEN }}
+          timeout: 5000
+          expect_text: 'Hello, world from D!'
