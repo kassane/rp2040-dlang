@@ -78,27 +78,18 @@ get_property(COMPILE_DEFINITIONS GLOBAL PROPERTY compilerdefs_list)
 list(REMOVE_DUPLICATES COMPILE_DEFINITIONS)
 list(PREPEND COMPILE_DEFINITIONS "")
 string(REPLACE "$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>" "$<TARGET_PROPERTY:${PROJECT_NAME},PICO_TARGET_BINARY_TYPE>" COMPILE_DEFINITIONS "${COMPILE_DEFINITIONS}")
-string(REPLACE ";" ";-Xcc;-D" COMPILE_DEFINITIONS "${COMPILE_DEFINITIONS}")
+string(REPLACE ";" ";-Xcc=-D" COMPILE_DEFINITIONS "${COMPILE_DEFINITIONS}")
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/_dcode.o
     COMMAND
     ${DC}
-    -i --verrors-context
+    -i --verrors-context -preview=all
     -mtriple=${D_TARGET} -mcpu=${D_CPU} -Xcc=-fshort-enums
-    -P-I${$ENV{PICO_SDK_PATH}}/src/common/pico_stdlib_headers/include
-    -P-I${$ENV{PICO_SDK_PATH}}/src/common/pico_base_headers/include
-    -P-I${$ENV{PICO_SDK_PATH}}/src/common/pico_divider_headers/include
-    -P-I${$ENV{PICO_SDK_PATH}}/src/host/hardware_gpio/include
-    -P-I${$ENV{PICO_SDK_PATH}}/src/host/pico_stdio/include
-    -P-I${$ENV{PICO_SDK_PATH}}/src/boards/include
-    -P-I${$ENV{PICO_SDK_PATH}}/src/rp2_common/pico_printf/include
-    -P-I${$ENV{PICO_SDK_PATH}}/src/rp2_common/pico_stdio/include
-    -P-I${$ENV{PICO_SDK_PATH}}/src/rp2_common/pico_stdio_usb/include
     ${COMPILE_DEFINITIONS}
     ${CLANG_ARCH_ABI_FLAGS}
-    $$\( echo '$<TARGET_PROPERTY:${PROJECT_NAME},INCLUDE_DIRECTORIES>' | tr '\;' '\\n' | sed -e 's/\\\(.*\\\)/-Xcc -I\\1/g' \)
-    $$\( echo '${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES}' | tr ' ' '\\n' | sed -e 's/\\\(.*\\\)/-Xcc -I\\1/g' \)
+    $$\( echo '$<TARGET_PROPERTY:${PROJECT_NAME},INCLUDE_DIRECTORIES>' | tr '\;' '\\n' | sed -e 's/\\\(.*\\\)/-P-I\\1/g' \)
+    $$\( echo '${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES}' | tr ' ' '\\n' | sed -e 's/\\\(.*\\\)/-P-I\\1/g' \)
     ${CMAKE_CURRENT_LIST_DIR}/source/app.d
     -betterC -O -I${CMAKE_CURRENT_LIST_DIR}/source
     -c -of=${CMAKE_CURRENT_BINARY_DIR}/_dcode.o

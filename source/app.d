@@ -1,18 +1,15 @@
 import pico;
 
-extern (C) void main()
+extern (C) void main() @safe
 {
-    stdio_init_all();
-    auto led = PICO_DEFAULT_LED_PIN;
-    gpio_init(led);
-    gpio_set_dir(led, /*out*/ true);
+    stdioInit();
+    auto led = GPIO(PICO_DEFAULT_LED_PIN, true);
     printf("Hello, world from D!");
     while (true)
     {
-        gpio_put(led, true);
-        sleep_ms(250);
-        gpio_put(led, false);
-        sleep_ms(250);
+        led.put(true);
+        sleepMs(250);
+        led.put(false);
+        sleepMs(250);
     }
-
 }

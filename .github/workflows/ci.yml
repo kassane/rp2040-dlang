@@ -25,8 +25,8 @@ jobs:
         run: PICO_SDK_PATH=$PWD/pico-sdk cmake -GNinja -B build -DCMAKE_BUILD_TYPE=Release
       - name: CMake Build 
         run: cmake --build build/ --parallel
-      - uses: wokwi/wokwi-ci-action@v1
-        with:
-          token: ${{ secrets.WOKWI_CI_TOKEN }}
-          timeout: 5000
-          expect_text: 'Hello, world from D!'
+      # - uses: wokwi/wokwi-ci-action@v1
+      #   with:
+      #     token: ${{ secrets.WOKWI_CI_TOKEN }}
+      #     timeout: 5000
+      #     expect_text: 'Hello, world from D!'

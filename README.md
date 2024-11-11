@@ -12,13 +12,13 @@ Use D programming language in Raspberry Pi Pico and other RP2040 boards
 ## How to build
 
 ```bash
-git clone https://github.com/raspberrypi/pico-sdk.git
+git clone --recursive https://github.com/raspberrypi/pico-sdk.git
 export PICO_SDK_PATH=$PWD/pico-sdk
 export PICO_PLATFORM=rp2040
 ```
 
 ```bash
-git clone https://github.com/kazuki-yoshii/rp2040-dlang.git
+git clone https://github.com/kassane/rp2040-dlang.git
 cd rp2040-dlang
 cmake -B build
 cmake --build build
