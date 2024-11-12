@@ -1,5 +1,5 @@
 module pico.uart;
-import pico.sdk;
+private import pico.sdk;
 
 struct UART
 {

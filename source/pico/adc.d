@@ -1,5 +1,5 @@
 module pico.adc;
-import pico.sdk;
+private import pico.sdk;
 
 struct ADC
 {

@@ -1,5 +1,5 @@
 module pico.i2c;
-import pico.sdk;
+private import pico.sdk;
 
 struct I2C
 {

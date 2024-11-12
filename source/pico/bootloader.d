@@ -1,5 +1,5 @@
 module pico.bootloader;
-import pico.sdk;
+private import pico.sdk;
 
 struct Bootloader
 {

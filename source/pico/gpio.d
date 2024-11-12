@@ -1,5 +1,5 @@
 module pico.gpio;
-import pico.sdk;
+private import pico.sdk;
 
 struct GPIO
 {
@@ -30,5 +30,140 @@ struct GPIO
     uint getFunction() @trusted
     {
         return gpio_get_function(pin);
+    }
+
+    void pullUp() @trusted
+    {
+        gpio_pull_up(pin);
+    }
+
+    void pullDown() @trusted
+    {
+        gpio_pull_down(pin);
+    }
+
+    void disablePulls() @trusted
+    {
+        gpio_disable_pulls(pin);
+    }
+
+    void setPulls(bool up, bool down) @trusted
+    {
+        gpio_set_pulls(pin, up, down);
+    }
+
+    void setIrqOver(uint value) @trusted
+    {
+        gpio_set_irqover(pin, value);
+    }
+
+    void setOutOver(uint value) @trusted
+    {
+        gpio_set_outover(pin, value);
+    }
+
+    void setInOver(uint value) @trusted
+    {
+        gpio_set_inover(pin, value);
+    }
+
+    void setOeOver(uint value) @trusted
+    {
+        gpio_set_oeover(pin, value);
+    }
+
+    void setInputEnabled(bool enable) @trusted
+    {
+        gpio_set_input_enabled(pin, enable);
+    }
+
+    void setInputHysteresisEnabled(bool enabled) @trusted
+    {
+        gpio_set_input_hysteresis_enabled(pin, enabled);
+    }
+
+    bool isInputHysteresisEnabled() @trusted
+    {
+        return gpio_is_input_hysteresis_enabled(pin);
+    }
+
+    void setSlewRate(gpio_slew_rate slew) @trusted
+    {
+        gpio_set_slew_rate(pin, slew);
+    }
+
+    gpio_slew_rate getSlewRate() @trusted
+    {
+        return gpio_get_slew_rate(pin);
+    }
+
+    void setDriveStrength(gpio_drive_strength drive) @trusted
+    {
+        gpio_set_drive_strength(pin, drive);
+    }
+
+    gpio_drive_strength getDriveStrength() @trusted
+    {
+        return gpio_get_drive_strength(pin);
+    }
+
+    void initMask(uint gpio_mask) @trusted
+    {
+        gpio_init_mask(gpio_mask);
+    }
+
+    uint getAll() @trusted
+    {
+        return gpio_get_all();
+    }
+
+    void setMask(uint mask) @trusted
+    {
+        gpio_set_mask(mask);
+    }
+
+    void clearMask(uint mask) @trusted
+    {
+        gpio_clr_mask(mask);
+    }
+
+    void xorMask(uint mask) @trusted
+    {
+        gpio_xor_mask(mask);
+    }
+
+    void putMasked(uint mask, uint value) @trusted
+    {
+        gpio_put_masked(mask, value);
+    }
+
+    void putAll(uint value) @trusted
+    {
+        gpio_put_all(value);
+    }
+
+    void setDirOutMasked(uint mask) @trusted
+    {
+        gpio_set_dir_out_masked(mask);
+    }
+
+    void setDirInMasked(uint mask) @trusted
+    {
+        gpio_set_dir_in_masked(mask);
+    }
+
+    void setDirMasked(uint mask, uint value) @trusted
+    {
+        gpio_set_dir_masked(mask, value);
+    }
+
+    void setDirAllBits(uint value) @trusted
+    {
+        gpio_set_dir_all_bits(value);
+    }
+
+    void debugPinsInit() @trusted
+    {
+        gpio_debug_pins_init();
     }
 }
