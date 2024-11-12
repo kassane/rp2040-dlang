@@ -100,11 +100,11 @@ add_custom_command(
     ${CLANG_ARCH_ABI_FLAGS}
     $$\( echo '$<TARGET_PROPERTY:${PROJECT_NAME},INCLUDE_DIRECTORIES>' | tr '\;' '\\n' | sed -e 's/\\\(.*\\\)/-P-I\\1/g' \)
     $$\( echo '${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES}' | tr ' ' '\\n' | sed -e 's/\\\(.*\\\)/-P-I\\1/g' \)
-    ${CMAKE_CURRENT_LIST_DIR}/source/app.d
+    ${CMAKE_CURRENT_LIST_DIR}/sample/app.d
     -betterC -O -I${CMAKE_CURRENT_LIST_DIR}/source
     -c -of=${CMAKE_CURRENT_BINARY_DIR}/_dcode.o
     DEPENDS
-    ${CMAKE_CURRENT_LIST_DIR}/source/app.d
+    ${CMAKE_CURRENT_LIST_DIR}/sample/app.d
 )
 add_custom_target(${PROJECT_NAME}-dcode DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/_dcode.o)
 

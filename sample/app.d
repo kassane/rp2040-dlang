@@ -1,4 +1,4 @@
-import pico;
+import pico : sleepMs, stdioInit, printf, PICO_DEFAULT_LED_PIN;
 import pico.gpio : GPIO;
 
 extern (C) void main() @safe
