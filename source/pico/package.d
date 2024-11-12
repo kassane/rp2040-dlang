@@ -21,7 +21,7 @@ extern (C) int printf(scope const(char)* fmt, ...) @trusted nothrow @nogc;
 
 void sleepMs(uint ms) @trusted
 {
-    sleep_us(ms);
+    sleep_ms(ms);
 }
 
 void stdioInit() @trusted
@@ -29,65 +29,130 @@ void stdioInit() @trusted
     stdio_init_all();
 }
 
-struct GPIO
+struct Array(T)
 {
-    private uint pin;
-
-    this(uint pin, bool output = false) @trusted
+    private
     {
-        this.pin = pin;
-        gpio_init(pin);
-        gpio_set_dir(pin, output);
+        T* ptr;
+        size_t len;
+        size_t cap;
     }
 
-    void put(bool value) @trusted
+    this(size_t initialCapacity) @trusted
     {
-        gpio_put(pin, value);
+        ptr = cast(T*) malloc(T.sizeof * initialCapacity);
+        len = 0;
+        cap = initialCapacity;
     }
 
-    bool get() @trusted
+    ~this() @trusted
     {
-        return gpio_get(pin);
+        if (ptr)
+            free(ptr);
     }
 
-    void setFunction(gpio_function_rp2040 fn) @trusted
+    void push(T value) @trusted
     {
-        gpio_set_function(pin, fn);
+        if (len == cap)
+        {
+            cap *= 2;
+            ptr = cast(T*) realloc(ptr, T.sizeof * cap);
+        }
+        ptr[len++] = value;
     }
 
-    uint getFunction() @trusted
+    T pop() @trusted
     {
-        return gpio_get_function(pin);
+        return ptr[--len];
+    }
+
+    ref T opIndex(size_t index) @trusted
+    {
+        return ptr[index];
+    }
+
+    size_t length() const @trusted
+    {
+        return len;
     }
 }
 
-struct UART
+@("Array tests")
+unittest
 {
-    private uart_inst* uart;
+    auto arr = Array!int(2);
+    assert(arr.length == 0);
 
-    this(scope uart_inst* uart_id, uint baud_rate) @trusted
+    arr.push(1);
+    assert(arr.length == 1);
+    assert(arr[0] == 1);
+
+    arr.push(2);
+    arr.push(3);
+    assert(arr.length == 3);
+    assert(arr[1] == 2);
+    assert(arr[2] == 3);
+
+    assert(arr.pop() == 3);
+    assert(arr.length == 2);
+}
+
+struct Option(T)
+{
+    private
     {
-        this.uart = uart_id;
-        uart_init(uart_id, baud_rate);
+        T value;
+        bool hasValue;
     }
 
-    void putc(char c) @trusted
+    static Option!T some(T value) @trusted
     {
-        uart_putc_raw(uart, c);
+        Option!T opt;
+        opt.value = value;
+        opt.hasValue = true;
+        return opt;
     }
 
-    int getc() @trusted
+    static Option!T none() @trusted
     {
-        return uart_getc(uart);
+        Option!T opt;
+        opt.hasValue = false;
+        return opt;
     }
 
-    bool isReadable() @trusted
+    bool isSome() const @trusted pure
     {
-        return uart_is_readable(uart);
+        return hasValue;
     }
 
-    bool isWritable() @trusted
+    bool isNone() const @trusted pure
     {
-        return uart_is_writable(uart);
+        return !hasValue;
     }
+
+    T unwrap() @trusted
+    {
+        assert(hasValue, "Called unwrap on None value");
+        return value;
+    }
+
+    T unwrapOr(T defaultValue) @trusted
+    {
+        return hasValue ? value : defaultValue;
+    }
+}
+
+@("Option tests")
+unittest
+{
+    auto some = Option!int.some(42);
+    assert(some.isSome());
+    assert(!some.isNone());
+    assert(some.unwrap() == 42);
+    assert(some.unwrapOr(0) == 42);
+
+    auto none = Option!int.none();
+    assert(!none.isSome());
+    assert(none.isNone());
+    assert(none.unwrapOr(0) == 0);
 }

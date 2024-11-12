@@ -1,11 +1,21 @@
 # Based on swift-embedded-examples/pico-blinky-sdk/CMakeLists.txt
 
 cmake_minimum_required(VERSION 3.13)
+# CMake will find the SDK and set PICO_SDK_PATH
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
 project(d-blinky)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# CMake will find the SDK and set PICO_SDK_PATH
+if(NOT DEFINED PICO_SDK_PATH)
+    message(FATAL_ERROR "PICO_SDK_PATH is not defined. Please set it to the path of the Pico SDK.")
+    return()
+endif()
+
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug")
+endif()
+
 pico_sdk_init()
 
 execute_process(COMMAND which ldc2 OUTPUT_VARIABLE DC OUTPUT_STRIP_TRAILING_WHITESPACE)
