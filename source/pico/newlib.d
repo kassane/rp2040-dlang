@@ -14,31 +14,29 @@
  * the above license grant, this restriction and the following disclaimer,
  * must be included in all copies of the Software, in whole or in part.
  */
-module pico.i2c;
-private import pico.sdk;
+module pico.newlib;
 
-struct I2C
+@nogc nothrow
+extern (C)
 {
-    private i2c_inst* i2c;
-
-    this(scope i2c_inst* i2c_id, uint baudrate) @trusted
+    pragma(printf)
+    uint printf(scope const(char)* fmt, ...) @trusted;
+    ///
+    scope void* malloc(size_t size) @trusted;
+    ///
+    scope void* realloc(scope void* ptr, size_t size) @trusted;
+    ///
+    scope void* calloc(size_t nmemb, size_t size) @trusted;
+    ///
+    void free(scope void* ptr) @trusted;
+    ///
+    noreturn onOutOfMemoryError()(scope void* pretend_sideffect = null) pure @trusted
     {
-        this.i2c = i2c_id;
-        i2c_init(i2c_id, baudrate);
+        assert(0, "Memory allocation failed");
     }
-
-    bool write(ubyte addr, const(ubyte)[] data, bool nostop) @trusted
+    ///
+    noreturn onInvalidMemoryOperationError()(scope void* pretend_sideffect = null) pure @trusted
     {
-        return i2c_write_blocking(i2c, addr, data.ptr, data.length, nostop) >= 0;
-    }
-
-    bool read(ubyte addr, ubyte[] data, bool nostop) @trusted
-    {
-        return i2c_read_blocking(i2c, addr, data.ptr, data.length, nostop) >= 0;
-    }
-
-    void setSlaveMode(bool is_slave, ubyte addr) @trusted
-    {
-        i2c_set_slave_mode(i2c, is_slave, addr);
+        assert(0, "Invalid memory operation");
     }
 }
