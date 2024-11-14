@@ -51,6 +51,7 @@ if(DC MATCHES ".*ldc2.*")
     list(APPEND D_FLAGS "--allinst")
     list(APPEND D_FLAGS "--linkonce-templates")
     list(APPEND D_FLAGS "-mtriple=${D_TARGET}")
+    list(APPEND D_FLAGS "-mcpu=${D_CPU}")
 
     if(CMAKE_BULD_TYPE MATCHES "Debug")
         list(APPEND D_FLAGS "-Og")
@@ -97,6 +98,7 @@ elseif(DC MATCHES ".*gdc.*")
         else()
             list(APPEND D_FLAGS "-march=armv7e-m")
         endif()
+        list(APPEND D_FLAGS "-mcpu=${D_CPU}")
     endif()
 
     list(APPEND D_FLAGS "-o")
@@ -106,7 +108,6 @@ elseif(DC MATCHES ".*dmd.*")
 else()
     message(FATAL_ERROR "Unknown D compiler: ${DC}")
 endif()
-list(APPEND D_FLAGS "-mcpu=${D_CPU}")
 
 add_executable(${PROJECT_NAME})
 
