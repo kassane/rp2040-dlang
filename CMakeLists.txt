@@ -67,7 +67,6 @@ if(DC MATCHES ".*ldc2$")
         list(APPEND D_FLAGS "--fno-moduleinfo")
     endif()
     if(PICO_PLATFORM STREQUAL "rp2350-riscv")
-        list(APPEND D_FLAGS "-Xcc=-DMBEDTLS_NO_PLATFORM_ENTROPY")
         list(APPEND D_FLAGS "-mattr=+i,+m,+a,+c,+zicsr,+zifencei,+zba,+zbb,+zbs,+zbkb" "-mabi=ilp32")
     else()
         list(APPEND D_FLAGS "--float-abi=soft")
@@ -117,6 +116,11 @@ else()
 endif()
 
 add_executable(${PROJECT_NAME})
+
+if(PICO_PLATFORM STREQUAL "rp2350-riscv")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE MBEDTLS_NO_PLATFORM_ENTROPY)
+endif()
+
 
 target_link_libraries(${PROJECT_NAME}
     pico_stdlib hardware_uart hardware_gpio
