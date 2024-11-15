@@ -1,6 +1,11 @@
 # Based on swift-embedded-examples/pico-blinky-sdk/CMakeLists.txt
 
 cmake_minimum_required(VERSION 3.13)
+
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
+    set(PICO_DEOPTIMIZED_DEBUG 1)
+endif()
 # CMake will find the SDK and set PICO_SDK_PATH
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
@@ -12,12 +17,6 @@ if(NOT DEFINED PICO_SDK_PATH)
     return()
 endif()
 
-if(NOT DEFINED CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Debug")
-endif()
-
-pico_sdk_init()
-
 option(BETTERC "Enable BetterC mode" OFF)
 
 set(D_FLAGS "")
@@ -27,6 +26,8 @@ if(DEFINED ENV{DC})
 else()
     message(FATAL_ERROR "DC is not defined. Please set it to the path of the D compiler.")
 endif()
+
+pico_sdk_init()
 
 
 if(PICO_PLATFORM STREQUAL "rp2350-arm-s")
@@ -43,7 +44,7 @@ elseif(PICO_PLATFORM STREQUAL "rp2350-riscv")
     set(D_CPU "generic-rv32")
 endif()
 
-if(DC MATCHES ".*ldc2.*")
+if(DC MATCHES ".*ldc2$")
     list(APPEND D_FLAGS "-preview=all")
     list(APPEND D_FLAGS "-Xcc=-fshort-enums")
     list(APPEND D_FLAGS "--verrors-context")
@@ -53,8 +54,10 @@ if(DC MATCHES ".*ldc2.*")
     list(APPEND D_FLAGS "-mtriple=${D_TARGET}")
     list(APPEND D_FLAGS "-mcpu=${D_CPU}")
 
-    if(CMAKE_BULD_TYPE MATCHES "Debug")
-        list(APPEND D_FLAGS "-Og")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        list(APPEND D_FLAGS "-g")
+        list(APPEND D_FLAGS "--gc")
+        list(APPEND D_FLAGS "-d-debug")
     else()
         list(APPEND D_FLAGS "-O")
     endif()
@@ -70,13 +73,13 @@ if(DC MATCHES ".*ldc2.*")
     endif()
 
     list(APPEND D_FLAGS "-of=${CMAKE_CURRENT_BINARY_DIR}/_dcode.o")
-elseif(DC MATCHES ".*gdc.*")
+elseif(DC MATCHES ".*gdc$")
     list(APPEND D_FLAGS "-fpreview=all")
     list(APPEND D_FLAGS "-fbounds-check")
     list(APPEND D_FLAGS "-fall-instantiations")
     list(APPEND D_FLAGS "-fshort-enums")
 
-    if(CMAKE_BULD_TYPE MATCHES "Debug")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         list(APPEND D_FLAGS "-Og")
         list(APPEND D_FLAGS "-fdebug")
     else()
@@ -103,7 +106,7 @@ elseif(DC MATCHES ".*gdc.*")
 
     list(APPEND D_FLAGS "-o")
     list(APPEND D_FLAGS "${CMAKE_CURRENT_BINARY_DIR}/_dcode.o")
-elseif(DC MATCHES ".*dmd.*")
+elseif(DC MATCHES ".*dmd$")
     message(FATAL_ERROR "DMD does not support rp2040.")
 else()
     message(FATAL_ERROR "Unknown D compiler: ${DC}")
