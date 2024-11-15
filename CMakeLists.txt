@@ -117,11 +117,6 @@ endif()
 
 add_executable(${PROJECT_NAME})
 
-if(PICO_PLATFORM STREQUAL "rp2350-riscv")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE -DMBEDTLS_NO_PLATFORM_ENTROPY)
-endif()
-
-
 target_link_libraries(${PROJECT_NAME}
     pico_stdlib hardware_uart hardware_gpio
 )

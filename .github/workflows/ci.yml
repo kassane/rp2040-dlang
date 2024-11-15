@@ -1,4 +1,4 @@
-name: Wokwi-CI Build
+name: CI/CD
 
 on: [push]
 
@@ -9,7 +9,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         dc: [ldc-master]
-        platform: [rp2040, rp2350-arm-s, rp2350-riscv]
+        platform: [rp2040, rp2350-arm-s] # FIXME: rp2350-riscv - mbedtls no-entropy error
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -74,24 +74,6 @@ jobs:
           curl -sLO https://github.com/opendlang/opend/releases/download/CI/opend-latest-linux-x86_64.tar.xz
           tar -xf opend-latest-linux-x86_64.tar.xz
           echo "$PWD/opend-latest-linux-x86_64/bin" >> $GITHUB_PATH
-      - name: Get riscv32 toolchain
-        if: startsWith(matrix.platform, 'rp2350-riscv') 
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            if [ "$RUNNER_ARCH" == "X64" ]; then
-              curl -sLO https://github.com/raspberrypi/pico-sdk-tools/releases/download/v2.0.0-5/riscv-toolchain-14-x86_64-lin.tar.gz
-              mkdir riscv-toolchain-14
-              tar -xf riscv-toolchain-14-x86_64-lin.tar.gz -C riscv-toolchain-14
-              echo "$PWD/riscv-toolchain-14/bin" >> $GITHUB_PATH
-            fi
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-            if [ "$RUNNER_ARCH" == "ARM64" ]; then
-              curl -sLO https://github.com/raspberrypi/pico-sdk-tools/releases/download/v2.0.0-5/riscv-toolchain-14-arm64-mac.zip
-              mkdir riscv-toolchain-14
-              unzip riscv-toolchain-14-arm64-mac.zip -d riscv-toolchain-14
-              echo "$PWD/riscv-toolchain-14/bin" >> $GITHUB_PATH
-            fi
-          fi
       - name: Get pico-sdk 
         run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
       - name: CMake Configure 
