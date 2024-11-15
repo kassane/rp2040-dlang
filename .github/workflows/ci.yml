@@ -2,33 +2,86 @@ name: Wokwi-CI Build
 
 on: [push]
 
-env:
-  PICO_PLATFORM: rp2040
-
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.runs-on }}
+        os: [ubuntu-latest, macos-latest]
+        dc: [ldc-master, gdc-14]
+        platform: [rp2040, rp2350-arm-s, rp2350-riscv]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: carlosperate/arm-none-eabi-gcc-action@v1
       - uses: dlang-community/setup-dlang@v2
         with:
-          compiler: ldc-master
+          compiler: ${{ matrix.dc }}
       - uses: lukka/get-cmake@latest
         with:
           cmakeVersion: latest
+      - name: Get riscv32 toolchain
+        if: startsWith(matrix.platform, 'rp2350-riscv') 
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            if [ "$RUNNER_ARCH" == "X64" ]; then
+              curl -sLO https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v14.2.0-2/xpack-riscv-none-elf-gcc-14.2.0-2-linux-x64.tar.gz
+              tar -xvf xpack-riscv-none-elf-gcc-14.2.0-2-linux-x64.tar.gz
+              echo "$PWD/xpack-riscv-none-elf-gcc-14.2.0-2-linux-x64/bin" >> $GITHUB_PATH
+            fi
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            if [ "$RUNNER_ARCH" == "ARM64" ]; then
+              curl -sLO https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v14.2.0-2/xpack-riscv-none-elf-gcc-14.2.0-2-darwin-arm64.tar.gz
+              tar -xvf xpack-riscv-none-elf-gcc-14.2.0-2-darwin-arm64.tar.gz
+              echo "$PWD/xpack-riscv-none-elf-gcc-14.2.0-2-darwin-arm64/bin" >> $GITHUB_PATH
+            fi
+          fi
       - name: Get pico-sdk 
         run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
       - name: CMake Configure 
-        run: PICO_SDK_PATH=$PWD/pico-sdk cmake -GNinja -B build -DCMAKE_BUILD_TYPE=Release
+        run: PICO_SDK_PATH=$PWD/pico-sdk PICO_PLATFORM=${{ matrix.platform }} cmake -GNinja -B build -DCMAKE_BUILD_TYPE=Release
       - name: CMake Build 
         run: cmake --build build/ --parallel
       # - uses: wokwi/wokwi-ci-action@v1
+      #   if: startsWith(matrix.platform, 'rp2040')
       #   with:
       #     token: ${{ secrets.WOKWI_CI_TOKEN }}
       #     timeout: 5000
       #     expect_text: 'Hello, world from D!'
+
+opend:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: carlosperate/arm-none-eabi-gcc-action@v1
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: latest
+      - name: Install opend
+        run: |
+          curl -sLO https://github.com/opendlang/opend/releases/download/CI/opend-latest-linux-x86_64.tar.xz
+          tar -xvf opend-latest-linux-x86_64.tar.xz
+          echo "$PWD/opend-latest-linux-x86_64/bin" >> $GITHUB_PATH
+      - name: Get riscv32 toolchain
+        if: startsWith(matrix.platform, 'rp2350-riscv') 
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            if [ "$RUNNER_ARCH" == "X64" ]; then
+              curl -sLO https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v14.2.0-2/xpack-riscv-none-elf-gcc-14.2.0-2-linux-x64.tar.gz
+              tar -xvf xpack-riscv-none-elf-gcc-14.2.0-2-linux-x64.tar.gz
+              echo "$PWD/xpack-riscv-none-elf-gcc-14.2.0-2-linux-x64/bin" >> $GITHUB_PATH
+            fi
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            if [ "$RUNNER_ARCH" == "ARM64" ]; then
+              curl -sLO https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v14.2.0-2/xpack-riscv-none-elf-gcc-14.2.0-2-darwin-arm64.tar.gz
+              tar -xvf xpack-riscv-none-elf-gcc-14.2.0-2-darwin-arm64.tar.gz
+              echo "$PWD/xpack-riscv-none-elf-gcc-14.2.0-2-darwin-arm64/bin" >> $GITHUB_PATH
+            fi
+          fi
+      - name: Get pico-sdk 
+        run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
+      - name: CMake Configure 
+        run: DC=ldc2 PICO_SDK_PATH=$PWD/pico-sdk PICO_PLATFORM=${{ matrix.platform }} cmake -GNinja -B build -DCMAKE_BUILD_TYPE=Release
+      - name: CMake Build 
+        run: cmake --build build/ --parallel
