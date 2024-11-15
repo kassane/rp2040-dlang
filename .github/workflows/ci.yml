@@ -45,7 +45,7 @@ jobs:
           if [[ "${{ matrix.platform }}" == "rp2350-riscv" ]]; then
             export CC=riscv32-unknown-elf-gcc; export CXX=riscv32-unknown-elf-g++; export PICO_SDK_PATH=$PWD/pico-sdk; export PICO_PLATFORM=${{ matrix.platform }}
           else
-            export CC=arm-none-eabi-gcc; export CXX=arm-none-eabi-g++; export PICO_SDK_PATH=$PWD/pico-sdk; export PICO_PLATFORM=${{ matrix.platform }}
+            export CC="arm-none-eabi-gcc --specs=nosys.specs"; export CXX="arm-none-eabi-g++ --specs=nosys.specs"; export PICO_SDK_PATH=$PWD/pico-sdk; export PICO_PLATFORM=${{ matrix.platform }}
           fi
           cmake -B build -GNinja -DCMAKE_BUILD_TYPE=Release
           cmake --build build/ --parallel
