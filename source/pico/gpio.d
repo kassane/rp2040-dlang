@@ -17,6 +17,11 @@
 module pico.gpio;
 private import pico.sdk;
 
+version (RP2040)
+    alias gpio_function = gpio_function_rp2040;
+else
+    alias gpio_function = gpio_function_rp2350;
+
 struct GPIO
 {
     private uint pin;
@@ -38,7 +43,7 @@ struct GPIO
         return gpio_get(pin);
     }
 
-    void setFunction(gpio_function_rp2040 fn) @trusted
+    void setFunction(gpio_function fn) @trusted
     {
         gpio_set_function(pin, fn);
     }
