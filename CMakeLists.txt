@@ -76,7 +76,7 @@ if(DC MATCHES ".*ldc2$")
     endif()
 
     list(APPEND D_FLAGS "-of=${CMAKE_CURRENT_BINARY_DIR}/_dcode.o")
-elseif(DC MATCHES ".*gdc$")
+elseif(DC MATCHES ".*gdc.*")
     list(APPEND D_FLAGS "-fpreview=all")
     list(APPEND D_FLAGS "-fbounds-check")
     list(APPEND D_FLAGS "-fall-instantiations")
