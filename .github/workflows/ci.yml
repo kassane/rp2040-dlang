@@ -40,9 +40,18 @@ jobs:
       - name: Get pico-sdk 
         run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
       - name: CMake Configure 
-        run: PICO_SDK_PATH=$PWD/pico-sdk PICO_PLATFORM=${{ matrix.platform }} ${{ startsWith(matrix.platform, 'rp2350-riscv') && 'PICO_GCC_TRIPLE=riscv-none-elf' || '' }} cmake -B build -GNinja -DCMAKE_BUILD_TYPE=Release
+        run: |
+          export PICO_SDK_PATH=$PWD/pico-sdk
+          export PICO_PLATFORM=${{ matrix.platform }}
+          ${{ startsWith(matrix.platform, 'rp2350-riscv') && 'export PICO_GCC_TRIPLE=riscv-none-elf' || '' }}
+          cmake -B build -GNinja -DCMAKE_BUILD_TYPE=Release
       - name: CMake Build 
-        run: cmake --build build/ --parallel
+        run: |
+          export PICO_SDK_PATH=$PWD/pico-sdk
+          export PICO_PLATFORM=${{ matrix.platform }}
+          ${{ startsWith(matrix.platform, 'rp2350-riscv') && 'export PICO_GCC_TRIPLE=riscv-none-elf' || '' }}
+          cmake --build build/ --parallel
+          
       # - uses: wokwi/wokwi-ci-action@v1
       #   if: startsWith(matrix.platform, 'rp2040')
       #   with:
