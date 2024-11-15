@@ -8,8 +8,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        dc: [ldc-master, gdc-14]
+        dc: [ldc-master, gdc-12]
         platform: [rp2040, rp2350-arm-s, rp2350-riscv]
+        exclude:
+          - { os: macos-latest, dc: gdc-12 }
+        include:
+          - { os: ubuntu-latest, dc: gdc }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
