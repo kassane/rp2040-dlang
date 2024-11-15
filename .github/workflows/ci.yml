@@ -49,7 +49,11 @@ jobs:
           fi
           cmake -B build -GNinja
       - name: CMake Build 
-        run: cmake --build build/ --parallel
+        run: |
+          if [[ "${{ matrix.platform }}" == "rp2350-riscv" ]]; then
+            export CC=riscv32-unknown-elf-gcc; export CXX=riscv32-unknown-elf-g++; export PICO_SDK_PATH=$PWD/pico-sdk; export PICO_PLATFORM=${{ matrix.platform }}
+          fi
+          cmake --build build/ --parallel
       # - uses: wokwi/wokwi-ci-action@v1
       #   if: startsWith(matrix.platform, 'rp2040')
       #   with:
