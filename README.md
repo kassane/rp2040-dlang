@@ -5,7 +5,8 @@ Use D programming language in Raspberry Pi Pico and other RP2040 boards
 ## Requirements
 
 - [Raspberry Pi Pico SDK](https://github.com/raspberrypi/pico-sdk)
-- [ARM GCC toolchain](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
+- [ARM GCC toolchain](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads) - for `rp2040` & `rp2350-arm-s` platforms
+- [pico-sdk-tools/riscv-toolchain](https://github.com/raspberrypi/pico-sdk-tools/releases) - for `rp2350-riscv` platform
 - [D compiler](https://dlang.org/download.html) - preferred **GDC** or **LDC2**
 - [CMake](https://cmake.org/download/)
 

@@ -43,10 +43,11 @@ jobs:
       - name: CMake Configure 
         run: |
           if [[ "${{ matrix.platform }}" == "rp2350-riscv" ]]; then
-            CC=riscv32-unknown-elf-gcc CXX=riscv32-unknown-elf-g++ PICO_SDK_PATH=$PWD/pico-sdk PICO_PLATFORM=${{ matrix.platform }} cmake -B build -GNinja -DCMAKE_BUILD_TYPE=Release
+            export CC=riscv32-unknown-elf-gcc; export CXX=riscv32-unknown-elf-g++; export PICO_SDK_PATH=$PWD/pico-sdk; export PICO_PLATFORM=${{ matrix.platform }}
           else
-            CC=arm-none-eabi-gcc CXX=arm-none-eabi-g++ PICO_SDK_PATH=$PWD/pico-sdk PICO_PLATFORM=${{ matrix.platform }} cmake -B build -GNinja -DCMAKE_BUILD_TYPE=Release
+            export CC=arm-none-eabi-gcc; export CXX=arm-none-eabi-g++; export PICO_SDK_PATH=$PWD/pico-sdk; export PICO_PLATFORM=${{ matrix.platform }}
           fi
+          cmake -B build -GNinja
           cmake --build build/ --parallel
       # - uses: wokwi/wokwi-ci-action@v1
       #   if: startsWith(matrix.platform, 'rp2040')
