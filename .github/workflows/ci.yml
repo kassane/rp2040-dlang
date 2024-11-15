@@ -38,7 +38,7 @@ jobs:
               echo "$PWD/riscv-toolchain-14/bin" >> $GITHUB_PATH
             fi
           fi
-          export PICO_GCC_TRIPLE=riscv-none-elf          
+          export CC=riscv32-unknown-elf          
       - name: Get pico-sdk 
         run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
       - name: CMake Configure 
