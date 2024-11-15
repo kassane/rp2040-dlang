@@ -22,7 +22,7 @@ jobs:
       - uses: lukka/get-cmake@latest
         with:
           cmakeVersion: latest
-      - uses: gregdavill/setup-riscv-gnu-toolchain@v2
+      - uses: gregdavill/setup-riscv-gnu-toolchain@v2.0
       - name: Get pico-sdk 
         run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
       - name: CMake Configure 
@@ -49,7 +49,7 @@ jobs:
           curl -sLO https://github.com/opendlang/opend/releases/download/CI/opend-latest-linux-x86_64.tar.xz
           tar -xvf opend-latest-linux-x86_64.tar.xz
           echo "$PWD/opend-latest-linux-x86_64/bin" >> $GITHUB_PATH
-      - uses: gregdavill/setup-riscv-gnu-toolchain@v2
+      - uses: gregdavill/setup-riscv-gnu-toolchain@v2.0
       - name: Get pico-sdk 
         run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
       - name: CMake Configure 
