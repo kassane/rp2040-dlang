@@ -13,6 +13,8 @@ jobs:
         exclude:
           - { os: macos-latest, dc: gdc-12 }
     runs-on: ${{ matrix.os }}
+    env:
+      PICO_GCC_TRIPLE: ${{ startsWith(matrix.platform, 'rp2350-riscv') && 'riscv-none-elf' || '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: carlosperate/arm-none-eabi-gcc-action@v1
@@ -37,7 +39,7 @@ jobs:
               tar -xf xpack-riscv-none-elf-gcc-14.2.0-2-darwin-arm64.tar.gz
               echo "$PWD/xpack-riscv-none-elf-gcc-14.2.0-2/bin" >> $GITHUB_PATH
             fi
-          fi
+          fi          
       - name: Get pico-sdk 
         run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
       - name: CMake Configure 
