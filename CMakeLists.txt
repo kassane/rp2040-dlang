@@ -118,7 +118,7 @@ endif()
 add_executable(${PROJECT_NAME})
 
 if(PICO_PLATFORM STREQUAL "rp2350-riscv")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE MBEDTLS_NO_PLATFORM_ENTROPY)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE -DMBEDTLS_NO_PLATFORM_ENTROPY)
 endif()
 
 
