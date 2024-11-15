@@ -22,6 +22,7 @@ jobs:
       - uses: lukka/get-cmake@latest
         with:
           cmakeVersion: latest
+          ninjaVersion: latest
       - name: Get riscv32 toolchain
         if: startsWith(matrix.platform, 'rp2350-riscv') 
         run: |
