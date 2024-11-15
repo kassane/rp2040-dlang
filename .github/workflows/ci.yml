@@ -25,23 +25,24 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             if [ "$RUNNER_ARCH" == "X64" ]; then
-              curl -sLO https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v14.2.0-2/xpack-riscv-none-elf-gcc-14.2.0-2-linux-x64.tar.gz
-              tar -xf xpack-riscv-none-elf-gcc-14.2.0-2-linux-x64.tar.gz
-              echo "$PWD/xpack-riscv-none-elf-gcc-14.2.0-2/bin" >> $GITHUB_PATH
+              curl -sLO https://github.com/raspberrypi/pico-sdk-tools/releases/download/v2.0.0-5/riscv-toolchain-14-x86_64-lin.tar.gz
+              mkdir riscv-toolchain-14
+              tar -xf riscv-toolchain-14-x86_64-lin.tar.gz -C riscv-toolchain-14
+              echo "$PWD/riscv-toolchain-14/bin" >> $GITHUB_PATH
             fi
           elif [ "$RUNNER_OS" == "macOS" ]; then
             if [ "$RUNNER_ARCH" == "ARM64" ]; then
-              curl -sLO https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v14.2.0-2/xpack-riscv-none-elf-gcc-14.2.0-2-darwin-arm64.tar.gz
-              tar -xf xpack-riscv-none-elf-gcc-14.2.0-2-darwin-arm64.tar.gz
-              echo "$PWD/xpack-riscv-none-elf-gcc-14.2.0-2/bin" >> $GITHUB_PATH
+              curl -sLO https://github.com/raspberrypi/pico-sdk-tools/releases/download/v2.0.0-5/riscv-toolchain-14-arm64-mac.zip
+              mkdir riscv-toolchain-14
+              unzip riscv-toolchain-14-arm64-mac.zip -d riscv-toolchain-14
+              echo "$PWD/riscv-toolchain-14/bin" >> $GITHUB_PATH
             fi
           fi
           export PICO_GCC_TRIPLE=riscv-none-elf          
       - name: Get pico-sdk 
         run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
       - name: CMake Configure 
-        run: |
-          PICO_SDK_PATH=$PWD/pico-sdk PICO_PLATFORM=${{ matrix.platform }} ${{ startsWith(matrix.platform, 'rp2350-riscv') && 'PICO_GCC_TRIPLE=riscv-none-elf' || '' }} ${{ startsWith(matrix.platform, 'rp2350-riscv') && 'CC=riscv-none-elf-gcc' || '' }} ${{ startsWith(matrix.platform, 'rp2350-riscv') && 'CXX=riscv-none-elf-g++' || '' }} cmake -B build -GNinja -DCMAKE_BUILD_TYPE=Release
+        run: PICO_SDK_PATH=$PWD/pico-sdk PICO_PLATFORM=${{ matrix.platform }} cmake -B build -GNinja -DCMAKE_BUILD_TYPE=Release
       - name: CMake Build 
         run: cmake --build build/ --parallel
       # - uses: wokwi/wokwi-ci-action@v1
@@ -62,22 +63,24 @@ jobs:
       - name: Install opend
         run: |
           curl -sLO https://github.com/opendlang/opend/releases/download/CI/opend-latest-linux-x86_64.tar.xz
-          tar -xvf opend-latest-linux-x86_64.tar.xz
+          tar -xf opend-latest-linux-x86_64.tar.xz
           echo "$PWD/opend-latest-linux-x86_64/bin" >> $GITHUB_PATH
       - name: Get riscv32 toolchain
         if: startsWith(matrix.platform, 'rp2350-riscv') 
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             if [ "$RUNNER_ARCH" == "X64" ]; then
-              curl -sLO https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v14.2.0-2/xpack-riscv-none-elf-gcc-14.2.0-2-linux-x64.tar.gz
-              tar -xvf xpack-riscv-none-elf-gcc-14.2.0-2-linux-x64.tar.gz
-              echo "$PWD/xpack-riscv-none-elf-gcc-14.2.0-2/bin" >> $GITHUB_PATH
+              curl -sLO https://github.com/raspberrypi/pico-sdk-tools/releases/download/v2.0.0-5/riscv-toolchain-14-x86_64-lin.tar.gz
+              mkdir riscv-toolchain-14
+              tar -xf riscv-toolchain-14-x86_64-lin.tar.gz -C riscv-toolchain-14
+              echo "$PWD/riscv-toolchain-14/bin" >> $GITHUB_PATH
             fi
           elif [ "$RUNNER_OS" == "macOS" ]; then
             if [ "$RUNNER_ARCH" == "ARM64" ]; then
-              curl -sLO https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v14.2.0-2/xpack-riscv-none-elf-gcc-14.2.0-2-darwin-arm64.tar.gz
-              tar -xvf xpack-riscv-none-elf-gcc-14.2.0-2-darwin-arm64.tar.gz
-              echo "$PWD/xpack-riscv-none-elf-gcc-14.2.0-2/bin" >> $GITHUB_PATH
+              curl -sLO https://github.com/raspberrypi/pico-sdk-tools/releases/download/v2.0.0-5/riscv-toolchain-14-arm64-mac.zip
+              mkdir riscv-toolchain-14
+              unzip riscv-toolchain-14-arm64-mac.zip -d riscv-toolchain-14
+              echo "$PWD/riscv-toolchain-14/bin" >> $GITHUB_PATH
             fi
           fi
       - name: Get pico-sdk 
