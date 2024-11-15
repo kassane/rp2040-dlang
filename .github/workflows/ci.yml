@@ -38,8 +38,10 @@ jobs:
               echo "$PWD/xpack-riscv-none-elf-gcc-14.2.0-2/bin" >> $GITHUB_PATH
             fi
           fi
-          cp $PWD/xpack-riscv-none-elf-gcc-14.2.0-2/bin/riscv-none-elf-gcc $PWD/xpack-riscv-none-elf-gcc-14.2.0-2/bin/riscv32-unknown-elf-gcc
-          cp $PWD/xpack-riscv-none-elf-gcc-14.2.0-2/bin/riscv-none-elf-g++ $PWD/xpack-riscv-none-elf-gcc-14.2.0-2/bin/riscv32-unknown-elf-g++
+          for f in $PWD/xpack-riscv-none-elf-gcc-14.2.0-2/bin/riscv-none-*; do
+            newname=$(echo "$f" | sed 's/riscv-none/riscv32-unknown/')
+            cp "$f" "$newname"
+          done      
       - name: Get pico-sdk 
         run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
       - name: CMake Configure 
