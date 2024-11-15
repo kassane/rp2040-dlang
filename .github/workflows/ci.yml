@@ -49,8 +49,7 @@ jobs:
       #     timeout: 5000
       #     expect_text: 'Hello, world from D!'
 
-opend:
-    needs: build
+  opend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
