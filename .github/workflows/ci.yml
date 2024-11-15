@@ -1,34 +1,82 @@
-name: Wokwi-CI Build
+name: CI/CD
 
 on: [push]
-
-env:
-  PICO_PLATFORM: rp2040
 
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.runs-on }}
+        os: [ubuntu-latest, macos-latest]
+        dc: [ldc-master]
+        platform: [rp2040, rp2350-arm-s] # FIXME: rp2350-riscv - mbedtls no-entropy error
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: carlosperate/arm-none-eabi-gcc-action@v1
       - uses: dlang-community/setup-dlang@v2
         with:
-          compiler: ldc-master
+          compiler: ${{ matrix.dc }}
       - uses: lukka/get-cmake@latest
         with:
           cmakeVersion: latest
+      - name: Get riscv32 toolchain
+        if: startsWith(matrix.platform, 'rp2350-riscv') 
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            if [ "$RUNNER_ARCH" == "X64" ]; then
+              curl -sLO https://github.com/raspberrypi/pico-sdk-tools/releases/download/v2.0.0-5/riscv-toolchain-14-x86_64-lin.tar.gz
+              mkdir riscv-toolchain-14
+              tar -xf riscv-toolchain-14-x86_64-lin.tar.gz -C riscv-toolchain-14
+              echo "$PWD/riscv-toolchain-14/bin" >> $GITHUB_PATH
+            fi
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            if [ "$RUNNER_ARCH" == "ARM64" ]; then
+              curl -sLO https://github.com/raspberrypi/pico-sdk-tools/releases/download/v2.0.0-5/riscv-toolchain-14-arm64-mac.zip
+              mkdir riscv-toolchain-14
+              unzip riscv-toolchain-14-arm64-mac.zip -d riscv-toolchain-14
+              echo "$PWD/riscv-toolchain-14/bin" >> $GITHUB_PATH
+            fi
+          fi
       - name: Get pico-sdk 
         run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
       - name: CMake Configure 
-        run: PICO_SDK_PATH=$PWD/pico-sdk cmake -GNinja -B build -DCMAKE_BUILD_TYPE=Release
+        run: |
+          if [[ "${{ matrix.platform }}" == "rp2350-riscv" ]]; then
+            export CC=riscv32-unknown-elf-gcc; export CXX=riscv32-unknown-elf-g++; export PICO_SDK_PATH=$PWD/pico-sdk; export PICO_PLATFORM=${{ matrix.platform }}
+          else
+            export CC="arm-none-eabi-gcc --specs=nosys.specs"; export CXX="arm-none-eabi-g++ --specs=nosys.specs"; export PICO_SDK_PATH=$PWD/pico-sdk; export PICO_PLATFORM=${{ matrix.platform }}
+          fi
+          cmake -B build -GNinja
       - name: CMake Build 
-        run: cmake --build build/ --parallel
+        run: |
+          if [[ "${{ matrix.platform }}" == "rp2350-riscv" ]]; then
+            export CC=riscv32-unknown-elf-gcc; export CXX=riscv32-unknown-elf-g++; export PICO_SDK_PATH=$PWD/pico-sdk; export PICO_PLATFORM=${{ matrix.platform }}
+          fi
+          cmake --build build/ --parallel
       # - uses: wokwi/wokwi-ci-action@v1
+      #   if: startsWith(matrix.platform, 'rp2040')
       #   with:
       #     token: ${{ secrets.WOKWI_CI_TOKEN }}
       #     timeout: 5000
       #     expect_text: 'Hello, world from D!'
+
+  opend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: carlosperate/arm-none-eabi-gcc-action@v1
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: latest
+      - name: Install opend
+        run: |
+          curl -sLO https://github.com/opendlang/opend/releases/download/CI/opend-latest-linux-x86_64.tar.xz
+          tar -xf opend-latest-linux-x86_64.tar.xz
+          echo "$PWD/opend-latest-linux-x86_64/bin" >> $GITHUB_PATH
+      - name: Get pico-sdk 
+        run: git clone --recursive --depth=1 -b 2.0.0 https://github.com/raspberrypi/pico-sdk.git
+      - name: CMake Configure 
+        run: DC=ldc2 PICO_SDK_PATH=$PWD/pico-sdk PICO_PLATFORM=${{ matrix.platform }} cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - name: CMake Build 
+        run: cmake --build build/ --parallel
