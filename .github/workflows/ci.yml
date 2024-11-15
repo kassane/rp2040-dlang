@@ -47,8 +47,9 @@ jobs:
           else
             export CC="arm-none-eabi-gcc --specs=nosys.specs"; export CXX="arm-none-eabi-g++ --specs=nosys.specs"; export PICO_SDK_PATH=$PWD/pico-sdk; export PICO_PLATFORM=${{ matrix.platform }}
           fi
-          cmake -B build -GNinja -DCMAKE_BUILD_TYPE=Release
-          cmake --build build/ --parallel
+          cmake -B build -GNinja
+      - name: CMake Build 
+        run: cmake --build build/ --parallel
       # - uses: wokwi/wokwi-ci-action@v1
       #   if: startsWith(matrix.platform, 'rp2040')
       #   with:
