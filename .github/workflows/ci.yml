@@ -54,12 +54,14 @@ jobs:
             export CC=riscv32-unknown-elf-gcc; export CXX=riscv32-unknown-elf-g++; export PICO_SDK_PATH=$PWD/pico-sdk; export PICO_PLATFORM=${{ matrix.platform }}
           fi
           cmake --build build/ --parallel
-      # - uses: wokwi/wokwi-ci-action@v1
-      #   if: startsWith(matrix.platform, 'rp2040')
-      #   with:
-      #     token: ${{ secrets.WOKWI_CI_TOKEN }}
-      #     timeout: 5000
-      #     expect_text: 'Hello, world from D!'
+      - uses: wokwi/wokwi-ci-server-action@v1
+        if: startsWith(matrix.platform, 'rp2040')
+      - uses: wokwi/wokwi-ci-action@v1
+        if: startsWith(matrix.platform, 'rp2040')
+        with:
+          token: ${{ secrets.WOKWI_CI_TOKEN }}
+          timeout: 5000
+          expect_text: 'Hello, world from D!'
 
   # opend:
   #   runs-on: ubuntu-latest
