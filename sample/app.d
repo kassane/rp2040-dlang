@@ -5,7 +5,7 @@ extern (C) void main() @safe
 {
     stdioInit();
     auto led = GPIO(PICO_DEFAULT_LED_PIN, true);
-    printf("Hello, world from D!");
+    printf("Hello, world from D!\n");
 
     while (true)
     {
