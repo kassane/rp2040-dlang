@@ -55,9 +55,9 @@ jobs:
           fi
           cmake --build build/ --parallel
       - uses: wokwi/wokwi-ci-server-action@v1
-        if: startsWith(matrix.platform, 'rp2040')
+        if: ${{ startsWith(matrix.platform, 'rp2040') && startsWith(runner.os, 'ubuntu') }}
       - uses: wokwi/wokwi-ci-action@v1
-        if: startsWith(matrix.platform, 'rp2040')
+        if: ${{ startsWith(matrix.platform, 'rp2040') && startsWith(runner.os, 'ubuntu') }}
         with:
           token: ${{ secrets.WOKWI_CI_TOKEN }}
           timeout: 5000
